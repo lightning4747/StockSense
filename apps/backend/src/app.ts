@@ -6,6 +6,8 @@ import { env } from "./config/env";
 import { globalRateLimiter } from "./middleware/rateLimiter";
 import { errorHandler } from "./middleware/errorHandler";
 import authRouter from "./modules/auth/auth.router";
+import warehousesRouter from "./modules/warehouses/warehouses.router";
+import locationsRouter from "./modules/locations/locations.router";
 
 const app = express();
 
@@ -37,6 +39,10 @@ const api = express.Router();
 
 // Phase 1: Auth
 api.use("/auth", authRouter);
+
+// Phase 2: Warehouses & Locations
+api.use("/warehouses", warehousesRouter);
+api.use("/locations", locationsRouter);
 
 app.use("/api/v1", api);
 
