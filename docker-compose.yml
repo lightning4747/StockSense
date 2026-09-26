@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: stocksense_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: stocksense
+      POSTGRES_PASSWORD: stocksense
+      POSTGRES_DB: stocksense
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stocksense -d stocksense"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend ─────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: stocksense_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://stocksense:stocksense@postgres:5432/stocksense
+      JWT_SECRET: ${JWT_SECRET:-change_me_to_a_long_random_secret_at_least_32_chars}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_ISSUER: ${JWT_ISSUER:-stocksense}
+      SMTP_HOST: ${SMTP_HOST:-smtp.example.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-user}
+      SMTP_PASS: ${SMTP_PASS:-pass}
+      SMTP_FROM: ${SMTP_FROM:-no-reply@stocksense.app}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/backend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
