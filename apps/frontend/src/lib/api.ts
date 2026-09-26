@@ -1,5 +1,3 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
-
 export interface ApiErrorResponse {
   error: {
     code: string;
@@ -22,93 +20,101 @@ export class ApiError extends Error {
   }
 }
 
-// Mock fallback handler for standalone frontend development before backend runs
-function handleMockAuth<T>(endpoint: string, options: RequestInit): { data: T; message?: string } | null {
+// Simulated network latency
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// In-memory mock database for categories
+let mockCategories = [
+  { id: 'cat_01h8x9p3q1m8v2n4t6w1', name: 'Raw Materials', productCount: 8, createdAt: '2026-09-26T10:00:00Z', updatedAt: '2026-09-26T10:00:00Z' },
+  { id: 'cat_01h8x9p3q1m8v2n4t6w2', name: 'Finished Goods', productCount: 15, createdAt: '2026-09-26T10:10:00Z', updatedAt: '2026-09-26T10:10:00Z' },
+  { id: 'cat_01h8x9p3q1m8v2n4t6w3', name: 'Packaging Supplies', productCount: 4, createdAt: '2026-09-26T10:20:00Z', updatedAt: '2026-09-26T10:20:00Z' },
+  { id: 'cat_01h8x9p3q1m8v2n4t6w4', name: 'Spare Parts & Tools', productCount: 0, createdAt: '2026-09-26T10:30:00Z', updatedAt: '2026-09-26T10:30:00Z' },
+];
+
+export async function apiClient<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<{ data: T; message?: string; pagination?: unknown }> {
+  await delay(150);
+
   const method = (options.method || 'GET').toUpperCase();
   const body = options.body ? JSON.parse(options.body as string) : {};
 
-  // Mock /auth/login
+  // POST /auth/login
   if (endpoint === '/auth/login' && method === 'POST') {
     const { loginId, password } = body;
     if (password === 'invalid') {
       throw new ApiError('Invalid Login Id or Password', 'INVALID_CREDENTIALS', 400);
     }
     const user = {
-      id: 'mock-user-uuid-001',
+      id: 'usr_01h8x9p3q1m8v2n4t6w9',
       loginId: loginId || 'inventory01',
       email: `${loginId || 'user'}@stocksense.internal`,
-      createdAt: new Date().toISOString(),
+      createdAt: '2026-09-26T10:30:00Z',
     };
     return {
       data: {
         user,
-        accessToken: `mock_jwt_token_${Date.now()}`,
+        accessToken: `jwt_mock_${Date.now()}`,
       } as unknown as T,
       message: 'Login successful',
     };
   }
 
-  // Mock /auth/signup
+  // POST /auth/signup
   if (endpoint === '/auth/signup' && method === 'POST') {
     const { loginId, email } = body;
     const user = {
-      id: 'mock-user-uuid-new',
-      loginId: loginId || 'inventory01',
-      email: email || 'user@example.com',
+      id: `usr_${Date.now().toString(36)}`,
+      loginId: loginId,
+      email: email,
       createdAt: new Date().toISOString(),
     };
     return {
       data: {
         user,
-        accessToken: `mock_jwt_token_${Date.now()}`,
+        accessToken: `jwt_mock_${Date.now()}`,
       } as unknown as T,
       message: 'Account created successfully',
     };
   }
 
-  // Mock /auth/me
+  // GET /auth/me
   if (endpoint === '/auth/me' && method === 'GET') {
-    const savedUserStr = localStorage.getItem('stocksense_user');
-    const user = savedUserStr
-      ? JSON.parse(savedUserStr)
-      : {
-          id: 'mock-user-uuid-001',
-          loginId: 'inventory01',
-          email: 'admin@stocksense.internal',
-          createdAt: new Date().toISOString(),
-        };
+    const savedUser = localStorage.getItem('stocksense_user');
+    if (!savedUser) {
+      throw new ApiError('Unauthorized', 'UNAUTHORIZED', 401);
+    }
     return {
-      data: user as unknown as T,
+      data: JSON.parse(savedUser) as T,
       message: 'Success',
     };
   }
 
-  // Mock /auth/password-reset/request
+  // POST /auth/password-reset/request
   if (endpoint === '/auth/password-reset/request' && method === 'POST') {
     return {
       data: {
         message: 'If the account exists, an OTP has been sent.',
       } as unknown as T,
+      message: 'OTP sent',
     };
   }
 
-  // Mock /auth/password-reset/verify
+  // POST /auth/password-reset/verify
   if (endpoint === '/auth/password-reset/verify' && method === 'POST') {
     const { otp } = body;
-    if (otp !== '123456') {
-      // In dev, accept 123456 or allow any 6 digit except 000000
-      if (otp === '000000') {
-        throw new ApiError('Invalid or expired OTP', 'INVALID_OTP', 400);
-      }
+    if (otp === '000000') {
+      throw new ApiError('Invalid or expired OTP', 'INVALID_OTP', 400);
     }
     return {
       data: {
-        resetToken: `mock_reset_token_${Date.now()}`,
+        resetToken: `reset_tok_${Date.now().toString(36)}`,
       } as unknown as T,
     };
   }
 
-  // Mock /auth/password-reset
+  // POST /auth/password-reset
   if (endpoint === '/auth/password-reset' && method === 'POST') {
     return {
       data: null as unknown as T,
@@ -116,7 +122,7 @@ function handleMockAuth<T>(endpoint: string, options: RequestInit): { data: T; m
     };
   }
 
-  // Mock /auth/logout
+  // POST /auth/logout
   if (endpoint === '/auth/logout' && method === 'POST') {
     return {
       data: null as unknown as T,
@@ -124,55 +130,102 @@ function handleMockAuth<T>(endpoint: string, options: RequestInit): { data: T; m
     };
   }
 
-  return null;
-}
+  // GET /categories
+  if (endpoint.startsWith('/categories') && method === 'GET') {
+    const urlObj = new URL(endpoint, 'http://localhost');
+    const search = urlObj.searchParams.get('search')?.toLowerCase() || '';
 
-export async function apiClient<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<{ data: T; message?: string; pagination?: unknown }> {
-  const token = localStorage.getItem('stocksense_token');
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
-
-    const contentType = response.headers.get('content-type');
-    const isJson = contentType && contentType.includes('application/json');
-    const body = isJson ? await response.json() : null;
-
-    if (!response.ok) {
-      const errorData = body as ApiErrorResponse | null;
-      const errorCode = errorData?.error?.code || 'API_ERROR';
-      const errorMessage = errorData?.error?.message || response.statusText || 'An error occurred';
-      throw new ApiError(errorMessage, errorCode, response.status, errorData?.error?.details);
+    let filtered = [...mockCategories];
+    if (search) {
+      filtered = filtered.filter((c) => c.name.toLowerCase().includes(search));
     }
 
-    return body;
-  } catch (error) {
-    // If backend server is not running or network request fails, seamlessly use mock responses
-    if (
-      error instanceof TypeError &&
-      (error.message.includes('fetch') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))
-    ) {
-      const mockResult = handleMockAuth<T>(endpoint, options);
-      if (mockResult) {
-        return mockResult;
+    return {
+      data: filtered as unknown as T,
+      message: 'Success',
+    };
+  }
+
+  // POST /categories
+  if (endpoint === '/categories' && method === 'POST') {
+    const { name } = body;
+    if (!name || !name.trim()) {
+      throw new ApiError('Category name is required', 'VALIDATION_ERROR', 400);
+    }
+
+    const existing = mockCategories.find((c) => c.name.toLowerCase() === name.trim().toLowerCase());
+    if (existing) {
+      throw new ApiError('A category with this name already exists', 'CONFLICT', 409);
+    }
+
+    const newCategory = {
+      id: `cat_${Date.now().toString(36)}`,
+      name: name.trim(),
+      productCount: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockCategories.unshift(newCategory);
+
+    return {
+      data: newCategory as unknown as T,
+      message: 'Category created successfully',
+    };
+  }
+
+  // PATCH /categories/:id
+  if (endpoint.startsWith('/categories/') && method === 'PATCH') {
+    const categoryId = endpoint.split('/')[2]?.split('?')[0];
+    const { name } = body;
+
+    const categoryIndex = mockCategories.findIndex((c) => c.id === categoryId);
+    if (categoryIndex === -1) {
+      throw new ApiError('Category not found', 'NOT_FOUND', 404);
+    }
+
+    if (name && name.trim()) {
+      const duplicate = mockCategories.find(
+        (c) => c.id !== categoryId && c.name.toLowerCase() === name.trim().toLowerCase()
+      );
+      if (duplicate) {
+        throw new ApiError('A category with this name already exists', 'CONFLICT', 409);
       }
+      mockCategories[categoryIndex].name = name.trim();
+      mockCategories[categoryIndex].updatedAt = new Date().toISOString();
     }
-    throw error;
+
+    return {
+      data: mockCategories[categoryIndex] as unknown as T,
+      message: 'Category updated successfully',
+    };
   }
+
+  // DELETE /categories/:id
+  if (endpoint.startsWith('/categories/') && method === 'DELETE') {
+    const categoryId = endpoint.split('/')[2]?.split('?')[0];
+    const category = mockCategories.find((c) => c.id === categoryId);
+
+    if (!category) {
+      throw new ApiError('Category not found', 'NOT_FOUND', 404);
+    }
+
+    // Invariant: Category containing products cannot be deleted unless reassigned
+    if (category.productCount > 0) {
+      throw new ApiError(
+        `Cannot delete category "${category.name}" because it contains ${category.productCount} products. Please reassign products first.`,
+        'CONFLICT',
+        409
+      );
+    }
+
+    mockCategories = mockCategories.filter((c) => c.id !== categoryId);
+
+    return {
+      data: null as unknown as T,
+      message: 'Category deleted successfully',
+    };
+  }
+
+  throw new ApiError(`Endpoint ${endpoint} not found`, 'NOT_FOUND', 404);
 }
