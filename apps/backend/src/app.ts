@@ -8,6 +8,11 @@ import { errorHandler } from "./middleware/errorHandler";
 import authRouter from "./modules/auth/auth.router";
 import warehousesRouter from "./modules/warehouses/warehouses.router";
 import locationsRouter from "./modules/locations/locations.router";
+import categoriesRouter from "./modules/categories/categories.router";
+import stockRouter from "./modules/stock/stock.router";
+import reorderingRouter from "./modules/stock/reordering.router";
+import deliveriesRouter from "./modules/deliveries/deliveries.router";
+import transfersRouter from "./modules/transfers/transfers.router";
 
 const app = express();
 
@@ -40,9 +45,20 @@ const api = express.Router();
 // Phase 1: Auth
 api.use("/auth", authRouter);
 
-// Phase 2: Warehouses & Locations
+// Phase 2: Warehouses & Locations (BE-1)
 api.use("/warehouses", warehousesRouter);
 api.use("/locations", locationsRouter);
+
+// Phase 2: Categories (BE-2)
+api.use("/categories", categoriesRouter);
+
+// Phase 3: Stock & Reordering Rules (BE-2)
+api.use("/stock", stockRouter);
+api.use("/reordering-rules", reorderingRouter);
+
+// Phase 4: Deliveries & Internal Transfers (BE-2)
+api.use("/deliveries", deliveriesRouter);
+api.use("/transfers", transfersRouter);
 
 app.use("/api/v1", api);
 
