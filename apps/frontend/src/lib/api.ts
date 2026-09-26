@@ -240,6 +240,84 @@ let mockReorderingRules = [
   },
 ];
 
+// In-memory mock database for receipts
+let mockReceipts: Array<{
+  id: string;
+  reference: string;
+  warehouseId: string;
+  destinationLocationId: string;
+  supplierName: string;
+  scheduledAt: string;
+  responsibleUserId: string;
+  status: 'DRAFT' | 'READY' | 'DONE' | 'CANCELED';
+  items: Array<{ id: string; productId: string; quantity: number }>;
+  createdAt: string;
+  updatedAt: string;
+}> = [
+  {
+    id: 'rec_01h8x9p3q1m8v2n4t6w1',
+    reference: 'WH/IN/0001',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w1',
+    destinationLocationId: 'loc_01h8x9p3q1m8v2n4t6w1',
+    supplierName: 'Azure Interior Supply Co.',
+    scheduledAt: '2026-09-26T10:00:00Z',
+    responsibleUserId: 'usr_01h8x9p3q1m8v2n4t6w9',
+    status: 'READY' as const,
+    items: [
+      {
+        id: 'ri_01h8x9p3q1m8v2n4t6w1',
+        productId: 'prod_01h8x9p3q1m8v2n4t6w1',
+        quantity: 20,
+      },
+      {
+        id: 'ri_01h8x9p3q1m8v2n4t6w2',
+        productId: 'prod_01h8x9p3q1m8v2n4t6w2',
+        quantity: 10,
+      },
+    ],
+    createdAt: '2026-09-26T09:00:00Z',
+    updatedAt: '2026-09-26T09:30:00Z',
+  },
+  {
+    id: 'rec_01h8x9p3q1m8v2n4t6w2',
+    reference: 'WH/IN/0002',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w1',
+    destinationLocationId: 'loc_01h8x9p3q1m8v2n4t6w2',
+    supplierName: 'Deco Addict Timber & Hardware',
+    scheduledAt: '2026-09-27T14:00:00Z',
+    responsibleUserId: 'usr_01h8x9p3q1m8v2n4t6w9',
+    status: 'DRAFT' as const,
+    items: [
+      {
+        id: 'ri_01h8x9p3q1m8v2n4t6w3',
+        productId: 'prod_01h8x9p3q1m8v2n4t6w3',
+        quantity: 500,
+      },
+    ],
+    createdAt: '2026-09-26T09:40:00Z',
+    updatedAt: '2026-09-26T09:40:00Z',
+  },
+  {
+    id: 'rec_01h8x9p3q1m8v2n4t6w3',
+    reference: 'WH/IN/0003',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w2',
+    destinationLocationId: 'loc_01h8x9p3q1m8v2n4t6w3',
+    supplierName: 'Apex Industrial Fasteners',
+    scheduledAt: '2026-09-25T11:00:00Z',
+    responsibleUserId: 'usr_01h8x9p3q1m8v2n4t6w9',
+    status: 'DONE' as const,
+    items: [
+      {
+        id: 'ri_01h8x9p3q1m8v2n4t6w4',
+        productId: 'prod_01h8x9p3q1m8v2n4t6w5',
+        quantity: 100,
+      },
+    ],
+    createdAt: '2026-09-25T10:00:00Z',
+    updatedAt: '2026-09-25T11:15:00Z',
+  },
+];
+
 export async function apiClient<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -1110,6 +1188,340 @@ export async function apiClient<T>(
     return {
       data: null as unknown as T,
       message: 'Reordering rule removed successfully',
+    };
+  }
+
+  // ==========================================
+  // RECEIPTS ENDPOINTS
+  // ==========================================
+
+  // GET /receipts
+  if (endpoint.startsWith('/receipts') && method === 'GET' && !endpoint.includes('/receipts/')) {
+    const url = new URL(`http://localhost${endpoint}`);
+    const search = url.searchParams.get('search')?.toLowerCase() || '';
+    const status = url.searchParams.get('status') || '';
+    const warehouseId = url.searchParams.get('warehouseId') || '';
+    const locationId = url.searchParams.get('locationId') || '';
+    const dateFrom = url.searchParams.get('dateFrom') || '';
+    const dateTo = url.searchParams.get('dateTo') || '';
+    const sortBy = url.searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = url.searchParams.get('sortOrder') || 'desc';
+    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+
+    let filtered = mockReceipts.map((r) => {
+      const wh = mockWarehouses.find((w) => w.id === r.warehouseId);
+      const loc = mockLocations.find((l) => l.id === r.destinationLocationId);
+      const enhancedItems = r.items.map((item) => {
+        const prod = mockProducts.find((p) => p.id === item.productId);
+        return {
+          ...item,
+          sku: prod?.sku || 'UNKNOWN',
+          productName: prod?.name || 'Unknown Product',
+        };
+      });
+
+      return {
+        ...r,
+        from: 'Vendor',
+        to: `${wh?.shortCode || 'WH'}/${loc?.name || 'Location'}`,
+        contact: r.supplierName,
+        warehouseName: wh?.name,
+        warehouseShortCode: wh?.shortCode,
+        destinationLocationName: loc?.name,
+        destinationLocationShortCode: loc?.shortCode,
+        responsible: {
+          id: r.responsibleUserId,
+          loginId: 'inventory01',
+        },
+        items: enhancedItems,
+      };
+    });
+
+    if (search) {
+      filtered = filtered.filter(
+        (r) =>
+          r.reference.toLowerCase().includes(search) ||
+          r.supplierName.toLowerCase().includes(search) ||
+          r.items.some((i) => i.productName.toLowerCase().includes(search) || i.sku.toLowerCase().includes(search))
+      );
+    }
+
+    if (status && status !== 'all') {
+      filtered = filtered.filter((r) => r.status === status);
+    }
+
+    if (warehouseId) {
+      filtered = filtered.filter((r) => r.warehouseId === warehouseId);
+    }
+
+    if (locationId) {
+      filtered = filtered.filter((r) => r.destinationLocationId === locationId);
+    }
+
+    if (dateFrom) {
+      filtered = filtered.filter((r) => new Date(r.scheduledAt) >= new Date(dateFrom));
+    }
+
+    if (dateTo) {
+      filtered = filtered.filter((r) => new Date(r.scheduledAt) <= new Date(dateTo));
+    }
+
+    filtered.sort((a, b) => {
+      let aVal = (a as unknown as Record<string, any>)[sortBy];
+      let bVal = (b as unknown as Record<string, any>)[sortBy];
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+      if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    const total = filtered.length;
+    const startIndex = (page - 1) * limit;
+    const paginated = filtered.slice(startIndex, startIndex + limit);
+
+    return {
+      data: paginated as unknown as T,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
+  }
+
+  // GET /receipts/:receiptId
+  if (
+    endpoint.startsWith('/receipts/') &&
+    method === 'GET' &&
+    !endpoint.endsWith('/ready') &&
+    !endpoint.endsWith('/validate') &&
+    !endpoint.endsWith('/cancel')
+  ) {
+    const receiptId = endpoint.split('/')[2]?.split('?')[0];
+    const receipt = mockReceipts.find((r) => r.id === receiptId);
+    if (!receipt) {
+      throw new ApiError('Receipt not found', 'NOT_FOUND', 404);
+    }
+
+    const wh = mockWarehouses.find((w) => w.id === receipt.warehouseId);
+    const loc = mockLocations.find((l) => l.id === receipt.destinationLocationId);
+    const items = receipt.items.map((item) => {
+      const prod = mockProducts.find((p) => p.id === item.productId);
+      return {
+        ...item,
+        sku: prod?.sku || 'UNKNOWN',
+        productName: prod?.name || 'Unknown Product',
+      };
+    });
+
+    return {
+      data: {
+        ...receipt,
+        warehouseName: wh?.name,
+        warehouseShortCode: wh?.shortCode,
+        destinationLocationName: loc?.name,
+        destinationLocationShortCode: loc?.shortCode,
+        from: 'Vendor',
+        to: `${wh?.shortCode || 'WH'}/${loc?.name || 'Location'}`,
+        contact: receipt.supplierName,
+        responsible: {
+          id: receipt.responsibleUserId,
+          loginId: 'inventory01',
+        },
+        items,
+      } as unknown as T,
+    };
+  }
+
+  // POST /receipts
+  if (endpoint === '/receipts' && method === 'POST') {
+    const { warehouseId, destinationLocationId, supplierName, scheduledAt, items } = body;
+    const nextSeq = String(mockReceipts.length + 1).padStart(4, '0');
+    const wh = mockWarehouses.find((w) => w.id === warehouseId);
+    const reference = `${wh?.shortCode || 'WH'}/IN/${nextSeq}`;
+    const newReceiptId = `rec_${Date.now().toString(36)}`;
+
+    const newItems = (items || []).map((it: any, idx: number) => ({
+      id: `ri_${Date.now().toString(36)}_${idx}`,
+      productId: it.productId,
+      quantity: Number(it.quantity) || 1,
+    }));
+
+    const newReceipt = {
+      id: newReceiptId,
+      reference,
+      warehouseId,
+      destinationLocationId,
+      supplierName: (supplierName || '').trim(),
+      scheduledAt: scheduledAt || new Date().toISOString(),
+      responsibleUserId: 'usr_01h8x9p3q1m8v2n4t6w9',
+      status: 'DRAFT' as const,
+      items: newItems,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockReceipts.unshift(newReceipt);
+
+    return {
+      data: {
+        id: newReceiptId,
+        reference,
+        status: 'DRAFT',
+        items: newItems,
+      } as unknown as T,
+      message: 'Receipt created successfully',
+    };
+  }
+
+  // PATCH /receipts/:receiptId
+  if (endpoint.startsWith('/receipts/') && method === 'PATCH') {
+    const receiptId = endpoint.split('/')[2]?.split('?')[0];
+    const index = mockReceipts.findIndex((r) => r.id === receiptId);
+    if (index === -1) {
+      throw new ApiError('Receipt not found', 'NOT_FOUND', 404);
+    }
+
+    if (mockReceipts[index].status === 'DONE' || mockReceipts[index].status === 'CANCELED') {
+      throw new ApiError(
+        `Receipt in status "${mockReceipts[index].status}" cannot be modified`,
+        'CONFLICT',
+        409
+      );
+    }
+
+    const { supplierName, scheduledAt, destinationLocationId, items } = body;
+    if (supplierName) mockReceipts[index].supplierName = supplierName.trim();
+    if (scheduledAt) mockReceipts[index].scheduledAt = scheduledAt;
+    if (destinationLocationId) mockReceipts[index].destinationLocationId = destinationLocationId;
+    if (items && Array.isArray(items)) {
+      mockReceipts[index].items = items.map((it: any, idx: number) => ({
+        id: it.id || `ri_${Date.now().toString(36)}_${idx}`,
+        productId: it.productId,
+        quantity: Number(it.quantity) || 1,
+      }));
+    }
+    mockReceipts[index].updatedAt = new Date().toISOString();
+
+    return {
+      data: mockReceipts[index] as unknown as T,
+      message: 'Receipt updated successfully',
+    };
+  }
+
+  // POST /receipts/:receiptId/ready
+  if (endpoint.includes('/ready') && method === 'POST') {
+    const receiptId = endpoint.split('/')[2];
+    const index = mockReceipts.findIndex((r) => r.id === receiptId);
+    if (index === -1) {
+      throw new ApiError('Receipt not found', 'NOT_FOUND', 404);
+    }
+
+    if (mockReceipts[index].status !== 'DRAFT') {
+      throw new ApiError(
+        `Cannot mark as ready: current status is "${mockReceipts[index].status}" (expected DRAFT)`,
+        'CONFLICT',
+        409
+      );
+    }
+
+    mockReceipts[index].status = 'READY';
+    mockReceipts[index].updatedAt = new Date().toISOString();
+
+    return {
+      data: {
+        id: mockReceipts[index].id,
+        status: 'READY',
+      } as unknown as T,
+      message: 'Receipt is ready',
+    };
+  }
+
+  // POST /receipts/:receiptId/validate
+  if (endpoint.includes('/validate') && method === 'POST') {
+    const receiptId = endpoint.split('/')[2];
+    const index = mockReceipts.findIndex((r) => r.id === receiptId);
+    if (index === -1) {
+      throw new ApiError('Receipt not found', 'NOT_FOUND', 404);
+    }
+
+    if (mockReceipts[index].status === 'DONE') {
+      throw new ApiError('Receipt is already validated', 'CONFLICT', 409);
+    }
+
+    if (mockReceipts[index].status !== 'READY') {
+      throw new ApiError(
+        `Cannot validate: receipt must be in READY state (currently "${mockReceipts[index].status}")`,
+        'CONFLICT',
+        409
+      );
+    }
+
+    const receipt = mockReceipts[index];
+
+    // Atomically increase stock at destination location
+    for (const item of receipt.items) {
+      const stockEntry = mockStockEntries.find(
+        (se) =>
+          se.productId === item.productId &&
+          se.warehouseId === receipt.warehouseId &&
+          se.locationId === receipt.destinationLocationId
+      );
+
+      if (stockEntry) {
+        stockEntry.onHand += item.quantity;
+        stockEntry.freeToUse += item.quantity;
+      } else {
+        mockStockEntries.push({
+          productId: item.productId,
+          warehouseId: receipt.warehouseId,
+          locationId: receipt.destinationLocationId,
+          onHand: item.quantity,
+          reserved: 0,
+          freeToUse: item.quantity,
+        });
+      }
+    }
+
+    mockReceipts[index].status = 'DONE';
+    mockReceipts[index].updatedAt = new Date().toISOString();
+
+    return {
+      data: {
+        id: receipt.id,
+        reference: receipt.reference,
+        status: 'DONE',
+      } as unknown as T,
+      message: 'Receipt validated successfully',
+    };
+  }
+
+  // POST /receipts/:receiptId/cancel
+  if (endpoint.includes('/cancel') && method === 'POST') {
+    const receiptId = endpoint.split('/')[2];
+    const index = mockReceipts.findIndex((r) => r.id === receiptId);
+    if (index === -1) {
+      throw new ApiError('Receipt not found', 'NOT_FOUND', 404);
+    }
+
+    if (mockReceipts[index].status === 'DONE') {
+      throw new ApiError('A validated (DONE) receipt cannot be canceled', 'CONFLICT', 409);
+    }
+
+    mockReceipts[index].status = 'CANCELED';
+    mockReceipts[index].updatedAt = new Date().toISOString();
+
+    return {
+      data: {
+        id: mockReceipts[index].id,
+        status: 'CANCELED',
+      } as unknown as T,
+      message: 'Receipt canceled successfully',
     };
   }
 
