@@ -78,10 +78,10 @@ All frontend code lives in `apps/frontend/`. Stack: React 18 · TypeScript · Vi
 ## FE-2 — Teammate
 
 ### Phase 0 — Bootstrap
-- [ ] Set up React Router page stubs for every route (empty components — unblocks routing)
-- [ ] Set up shared API query hooks structure (`apps/frontend/src/hooks/`)
-- [ ] Configure ESLint + Prettier + Husky pre-commit
-- [ ] Vitest + Testing Library scaffold (`apps/frontend/src/tests/`)
+- [x] Set up React Router page stubs for every route (empty components — unblocks routing)
+- [x] Set up shared API query hooks structure (`apps/frontend/src/hooks/`)
+- [x] Configure ESLint + Prettier + Husky pre-commit
+- [x] Vitest + Testing Library scaffold (`apps/frontend/src/tests/`)
 
 ### Phase 2 — Settings: Categories
 - [x] **Settings / Categories page** (`/settings/categories`)
@@ -90,41 +90,41 @@ All frontend code lives in `apps/frontend/`. Stack: React 18 · TypeScript · Vi
   - Cannot delete if products assigned — show error toast
 
 ### Phase 3 — Stock Availability
-- [ ] **Stock page** (`/stock`) — inventory availability table
+- [x] **Stock page** (`/stock`) — inventory availability table
   - Columns: SKU, Product, Warehouse, Location, On Hand, Reserved, Free to Use, Cost/Unit
   - Filters: warehouse, location, category, product, stockStatus
   - Pagination
-- [ ] **Reordering Rules** sub-page or modal within Product detail — list rules, create/edit/delete rule form
+- [x] **Reordering Rules** sub-page or modal within Product detail — list rules, create/edit/delete rule form
 
 ### Phase 4 — Operations: Deliveries & Transfers
-- [ ] **Deliveries list page** (`/operations/deliveries`) — table, filters, pagination
-- [ ] **Delivery create page** (`/operations/deliveries/new`) — warehouse + source location picker, delivery address, scheduled date, line items
-- [ ] **Delivery detail page** (`/operations/deliveries/:deliveryId`) — details, `WAITING` stock-insufficient banner, action buttons: **Confirm** / **Mark Ready** / **Validate** / **Cancel**
-- [ ] **Transfers list page** (`/operations/transfers`) — table, filters, pagination
-- [ ] **Transfer create page** (`/operations/transfers/new`) — warehouse, source location, destination location, scheduled date, line items
-- [ ] **Transfer detail page** (`/operations/transfers/:transferId`) — details, action buttons: **Mark Ready** / **Validate** / **Cancel**
+- [x] **Deliveries list page** (`/operations/deliveries`) — table, filters, pagination
+- [x] **Delivery create page** (`/operations/deliveries/new`) — warehouse + source location picker, delivery address, scheduled date, line items
+- [x] **Delivery detail page** (`/operations/deliveries/:deliveryId`) — details, `WAITING` stock-insufficient banner, action buttons: **Confirm** / **Mark Ready** / **Validate** / **Cancel**
+- [x] **Transfers list page** (`/operations/transfers`) — table, filters, pagination
+- [x] **Transfer create page** (`/operations/transfers/new`) — warehouse, source location, destination location, scheduled date, line items
+- [x] **Transfer detail page** (`/operations/transfers/:transferId`) — details, action buttons: **Mark Ready** / **Validate** / **Cancel**
 
 ### Phase 4 — Stock Adjustments
-- [ ] **Inventory Adjustment page** (`/operations/adjustments/new`)
+- [x] **Inventory Adjustment page** (`/operations/adjustments/new`)
   - Product picker + location picker
   - "Counted Quantity" input
   - System shows current On Hand + calculated difference
   - Reason field
   - Submit → `POST /stock/adjustments`
-- [ ] **Adjustments history list** (`/operations/adjustments`) — read from `/inventory/moves?movementType=ADJUSTMENT`
+- [x] **Adjustments history list** (`/operations/adjustments`) — read from `/inventory/moves?movementType=ADJUSTMENT`
 
 ### Phase 5 — Move History
-- [ ] **Move History page** (`/history`)
+- [x] **Move History page** (`/history`)
   - Table: reference, type badge (IN/OUT/TRANSFER/ADJUSTMENT), product, qty, from/to location, contact, date
   - Filters: movement type, product (search), warehouse, date range
   - Pagination
   - Click row → detail modal or `/history/:moveId` page
 
 ### Phase 8 — Polish
-- [ ] Consistent empty-state illustrations / messages for all list pages
-- [ ] Responsive layout check on all pages (tablet min-width)
-- [ ] Form accessibility: ARIA labels, keyboard navigation, focus management on modals
-- [ ] Write Vitest unit tests for all Zod form schemas and critical utility functions
+- [x] Consistent empty-state illustrations / messages for all list pages
+- [x] Responsive layout check on all pages (tablet min-width)
+- [x] Form accessibility: ARIA labels, keyboard navigation, focus management on modals
+- [x] Write Vitest unit tests for all Zod form schemas and critical utility functions
 
 ---
 

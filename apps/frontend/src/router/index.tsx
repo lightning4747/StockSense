@@ -15,6 +15,16 @@ import { ProductDetailPage } from '@/features/products/ProductDetailPage';
 import { ReceiptsPage } from '@/features/receipts/ReceiptsPage';
 import { ReceiptCreatePage } from '@/features/receipts/ReceiptCreatePage';
 import { ReceiptDetailPage } from '@/features/receipts/ReceiptDetailPage';
+import { StockPage } from '@/features/stock/StockPage';
+import { DeliveriesPage } from '@/features/deliveries/DeliveriesPage';
+import { DeliveryCreatePage } from '@/features/deliveries/DeliveryCreatePage';
+import { DeliveryDetailPage } from '@/features/deliveries/DeliveryDetailPage';
+import { TransfersPage } from '@/features/transfers/TransfersPage';
+import { TransferCreatePage } from '@/features/transfers/TransferCreatePage';
+import { TransferDetailPage } from '@/features/transfers/TransferDetailPage';
+import { AdjustmentsPage } from '@/features/adjustments/AdjustmentsPage';
+import { AdjustmentCreatePage } from '@/features/adjustments/AdjustmentCreatePage';
+import { HistoryPage } from '@/features/history/HistoryPage';
 
 export const router = createBrowserRouter([
   {
@@ -61,12 +71,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/stock',
-            element: (
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold tracking-tight">Stock Availability</h1>
-                <p className="text-sm text-muted-foreground">Multi-warehouse inventory levels and reservations</p>
-              </div>
-            ),
+            element: <StockPage />,
           },
           {
             path: '/operations/receipts',
@@ -82,39 +87,39 @@ export const router = createBrowserRouter([
           },
           {
             path: '/operations/deliveries',
-            element: (
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold tracking-tight">Delivery Orders</h1>
-                <p className="text-sm text-muted-foreground">Fulfill outgoing customer shipments</p>
-              </div>
-            ),
+            element: <DeliveriesPage />,
+          },
+          {
+            path: '/operations/deliveries/new',
+            element: <DeliveryCreatePage />,
+          },
+          {
+            path: '/operations/deliveries/:deliveryId',
+            element: <DeliveryDetailPage />,
           },
           {
             path: '/operations/transfers',
-            element: (
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold tracking-tight">Internal Transfers</h1>
-                <p className="text-sm text-muted-foreground">Move inventory between locations and warehouses</p>
-              </div>
-            ),
+            element: <TransfersPage />,
+          },
+          {
+            path: '/operations/transfers/new',
+            element: <TransferCreatePage />,
+          },
+          {
+            path: '/operations/transfers/:transferId',
+            element: <TransferDetailPage />,
           },
           {
             path: '/operations/adjustments',
-            element: (
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold tracking-tight">Inventory Adjustments</h1>
-                <p className="text-sm text-muted-foreground">Physical count reconciliation and scrap adjustments</p>
-              </div>
-            ),
+            element: <AdjustmentsPage />,
+          },
+          {
+            path: '/operations/adjustments/new',
+            element: <AdjustmentCreatePage />,
           },
           {
             path: '/history',
-            element: (
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold tracking-tight">Move History</h1>
-                <p className="text-sm text-muted-foreground">Immutable stock ledger movements log</p>
-              </div>
-            ),
+            element: <HistoryPage />,
           },
           {
             path: '/settings',
