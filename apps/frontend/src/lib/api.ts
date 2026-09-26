@@ -98,6 +98,148 @@ let mockLocations = [
   },
 ];
 
+// In-memory mock database for products
+let mockProducts = [
+  {
+    id: 'prod_01h8x9p3q1m8v2n4t6w1',
+    sku: 'DESK001',
+    name: 'Ergonomic Standing Desk',
+    categoryId: 'cat_01h8x9p3q1m8v2n4t6w2',
+    unitOfMeasure: 'unit',
+    costPerUnit: 350.0,
+    reorderPoint: 10,
+    reorderQuantity: 25,
+    onHand: 45,
+    freeToUse: 40,
+    createdAt: '2026-09-26T09:00:00Z',
+    updatedAt: '2026-09-26T09:00:00Z',
+  },
+  {
+    id: 'prod_01h8x9p3q1m8v2n4t6w2',
+    sku: 'CHAIR002',
+    name: 'Mesh Executive Chair',
+    categoryId: 'cat_01h8x9p3q1m8v2n4t6w2',
+    unitOfMeasure: 'unit',
+    costPerUnit: 180.0,
+    reorderPoint: 15,
+    reorderQuantity: 30,
+    onHand: 8,
+    freeToUse: 5,
+    createdAt: '2026-09-26T09:10:00Z',
+    updatedAt: '2026-09-26T09:10:00Z',
+  },
+  {
+    id: 'prod_01h8x9p3q1m8v2n4t6w3',
+    sku: 'STEEL003',
+    name: 'Cold-Rolled Steel Sheet 2mm',
+    categoryId: 'cat_01h8x9p3q1m8v2n4t6w1',
+    unitOfMeasure: 'kg',
+    costPerUnit: 4.5,
+    reorderPoint: 500,
+    reorderQuantity: 1000,
+    onHand: 0,
+    freeToUse: 0,
+    createdAt: '2026-09-26T09:20:00Z',
+    updatedAt: '2026-09-26T09:20:00Z',
+  },
+  {
+    id: 'prod_01h8x9p3q1m8v2n4t6w4',
+    sku: 'BOX004',
+    name: 'Heavy-Duty Corrugated Carton Large',
+    categoryId: 'cat_01h8x9p3q1m8v2n4t6w3',
+    unitOfMeasure: 'bundle',
+    costPerUnit: 22.0,
+    reorderPoint: 20,
+    reorderQuantity: 50,
+    onHand: 65,
+    freeToUse: 60,
+    createdAt: '2026-09-26T09:30:00Z',
+    updatedAt: '2026-09-26T09:30:00Z',
+  },
+  {
+    id: 'prod_01h8x9p3q1m8v2n4t6w5',
+    sku: 'BOLT005',
+    name: 'M8 Stainless Steel Hex Bolts (Pack of 100)',
+    categoryId: 'cat_01h8x9p3q1m8v2n4t6w4',
+    unitOfMeasure: 'pack',
+    costPerUnit: 12.5,
+    reorderPoint: 30,
+    reorderQuantity: 100,
+    onHand: 110,
+    freeToUse: 105,
+    createdAt: '2026-09-26T09:40:00Z',
+    updatedAt: '2026-09-26T09:40:00Z',
+  },
+];
+
+// In-memory mock database for stock per location
+let mockStockEntries = [
+  {
+    productId: 'prod_01h8x9p3q1m8v2n4t6w1',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w1',
+    locationId: 'loc_01h8x9p3q1m8v2n4t6w1',
+    onHand: 35,
+    reserved: 5,
+    freeToUse: 30,
+  },
+  {
+    productId: 'prod_01h8x9p3q1m8v2n4t6w1',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w1',
+    locationId: 'loc_01h8x9p3q1m8v2n4t6w2',
+    onHand: 10,
+    reserved: 0,
+    freeToUse: 10,
+  },
+  {
+    productId: 'prod_01h8x9p3q1m8v2n4t6w2',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w1',
+    locationId: 'loc_01h8x9p3q1m8v2n4t6w1',
+    onHand: 8,
+    reserved: 3,
+    freeToUse: 5,
+  },
+  {
+    productId: 'prod_01h8x9p3q1m8v2n4t6w4',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w1',
+    locationId: 'loc_01h8x9p3q1m8v2n4t6w1',
+    onHand: 65,
+    reserved: 5,
+    freeToUse: 60,
+  },
+  {
+    productId: 'prod_01h8x9p3q1m8v2n4t6w5',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w2',
+    locationId: 'loc_01h8x9p3q1m8v2n4t6w3',
+    onHand: 110,
+    reserved: 5,
+    freeToUse: 105,
+  },
+];
+
+// In-memory mock database for reordering rules
+let mockReorderingRules = [
+  {
+    id: 'rule_01h8x9p3q1m8v2n4t6w1',
+    productId: 'prod_01h8x9p3q1m8v2n4t6w1',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w1',
+    locationId: 'loc_01h8x9p3q1m8v2n4t6w1',
+    minQuantity: 10,
+    maxQuantity: 50,
+    createdAt: '2026-09-26T09:05:00Z',
+    updatedAt: '2026-09-26T09:05:00Z',
+  },
+  {
+    id: 'rule_01h8x9p3q1m8v2n4t6w2',
+    productId: 'prod_01h8x9p3q1m8v2n4t6w2',
+    warehouseId: 'wh_01h8x9p3q1m8v2n4t6w1',
+    locationId: 'loc_01h8x9p3q1m8v2n4t6w1',
+    minQuantity: 15,
+    maxQuantity: 60,
+    createdAt: '2026-09-26T09:15:00Z',
+    updatedAt: '2026-09-26T09:15:00Z',
+  },
+];
+
 export async function apiClient<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -600,6 +742,374 @@ export async function apiClient<T>(
     return {
       data: null as unknown as T,
       message: 'Location deleted successfully',
+    };
+  }
+
+  // ==========================================
+  // PRODUCTS ENDPOINTS
+  // ==========================================
+
+  // GET /products
+  if (endpoint.startsWith('/products') && method === 'GET' && !endpoint.includes('/products/')) {
+    const url = new URL(`http://localhost${endpoint}`);
+    const search = url.searchParams.get('search')?.toLowerCase() || '';
+    const sku = url.searchParams.get('sku')?.toLowerCase() || '';
+    const categoryId = url.searchParams.get('categoryId') || '';
+    const stockStatus = url.searchParams.get('stockStatus') || 'all';
+    const warehouseId = url.searchParams.get('warehouseId') || '';
+    const locationId = url.searchParams.get('locationId') || '';
+    const sortBy = url.searchParams.get('sortBy') || 'name';
+    const sortOrder = url.searchParams.get('sortOrder') || 'asc';
+    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+
+    let filtered = mockProducts.map((p) => {
+      const cat = mockCategories.find((c) => c.id === p.categoryId);
+      // Calculate onHand and freeToUse from stockEntries
+      const productStockEntries = mockStockEntries.filter((se) => se.productId === p.id);
+      const computedOnHand = productStockEntries.reduce((sum, se) => sum + se.onHand, 0);
+      const computedFreeToUse = productStockEntries.reduce((sum, se) => sum + se.freeToUse, 0);
+      return {
+        ...p,
+        category: cat ? { id: cat.id, name: cat.name } : undefined,
+        onHand: computedOnHand,
+        freeToUse: computedFreeToUse,
+      };
+    });
+
+    if (search) {
+      filtered = filtered.filter(
+        (p) => p.name.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search)
+      );
+    }
+
+    if (sku) {
+      filtered = filtered.filter((p) => p.sku.toLowerCase().includes(sku));
+    }
+
+    if (categoryId) {
+      filtered = filtered.filter((p) => p.categoryId === categoryId);
+    }
+
+    if (warehouseId || locationId) {
+      filtered = filtered.filter((p) => {
+        return mockStockEntries.some(
+          (se) =>
+            se.productId === p.id &&
+            (!warehouseId || se.warehouseId === warehouseId) &&
+            (!locationId || se.locationId === locationId) &&
+            se.onHand > 0
+        );
+      });
+    }
+
+    if (stockStatus && stockStatus !== 'all') {
+      if (stockStatus === 'out') {
+        filtered = filtered.filter((p) => (p.onHand || 0) <= 0);
+      } else if (stockStatus === 'low') {
+        filtered = filtered.filter((p) => (p.onHand || 0) > 0 && (p.onHand || 0) <= p.reorderPoint);
+      } else if (stockStatus === 'available') {
+        filtered = filtered.filter((p) => (p.onHand || 0) > p.reorderPoint);
+      }
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      let aVal = (a as unknown as Record<string, any>)[sortBy];
+      let bVal = (b as unknown as Record<string, any>)[sortBy];
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+      if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    const total = filtered.length;
+    const startIndex = (page - 1) * limit;
+    const paginated = filtered.slice(startIndex, startIndex + limit);
+
+    return {
+      data: paginated as unknown as T,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
+  }
+
+  // GET /products/:productId
+  if (endpoint.startsWith('/products/') && method === 'GET') {
+    const prodId = endpoint.split('/')[2]?.split('?')[0];
+    const prod = mockProducts.find((p) => p.id === prodId);
+    if (!prod) {
+      throw new ApiError('Product not found', 'NOT_FOUND', 404);
+    }
+
+    const cat = mockCategories.find((c) => c.id === prod.categoryId);
+    const productStockEntries = mockStockEntries.filter((se) => se.productId === prod.id);
+    const onHand = productStockEntries.reduce((sum, se) => sum + se.onHand, 0);
+    const freeToUse = productStockEntries.reduce((sum, se) => sum + se.freeToUse, 0);
+
+    return {
+      data: {
+        ...prod,
+        category: cat ? { id: cat.id, name: cat.name } : undefined,
+        onHand,
+        freeToUse,
+      } as unknown as T,
+    };
+  }
+
+  // POST /products
+  if (endpoint === '/products' && method === 'POST') {
+    const {
+      name,
+      sku,
+      categoryId,
+      unitOfMeasure,
+      costPerUnit,
+      reorderPoint,
+      reorderQuantity,
+      initialStock,
+      initialLocationId,
+    } = body;
+
+    const cleanSku = (sku || '').trim().toUpperCase();
+    if (mockProducts.some((p) => p.sku.toUpperCase() === cleanSku)) {
+      throw new ApiError(`A product with SKU "${cleanSku}" already exists`, 'CONFLICT', 409);
+    }
+
+    const newProductId = `prod_${Date.now().toString(36)}`;
+    const newProduct = {
+      id: newProductId,
+      name: (name || '').trim(),
+      sku: cleanSku,
+      categoryId,
+      unitOfMeasure: (unitOfMeasure || 'unit').trim(),
+      costPerUnit: Number(costPerUnit) || 0,
+      reorderPoint: Number(reorderPoint) || 0,
+      reorderQuantity: Number(reorderQuantity) || 10,
+      onHand: Number(initialStock) || 0,
+      freeToUse: Number(initialStock) || 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockProducts.unshift(newProduct);
+
+    // Update category product count
+    const cat = mockCategories.find((c) => c.id === categoryId);
+    if (cat) {
+      cat.productCount = (cat.productCount || 0) + 1;
+    }
+
+    // Handle initial stock
+    if (Number(initialStock) > 0 && initialLocationId) {
+      const loc = mockLocations.find((l) => l.id === initialLocationId);
+      if (loc) {
+        mockStockEntries.push({
+          productId: newProductId,
+          warehouseId: loc.warehouseId,
+          locationId: loc.id,
+          onHand: Number(initialStock),
+          reserved: 0,
+          freeToUse: Number(initialStock),
+        });
+      }
+    }
+
+    return {
+      data: newProduct as unknown as T,
+      message: 'Product created successfully',
+    };
+  }
+
+  // PATCH /products/:productId
+  if (endpoint.startsWith('/products/') && method === 'PATCH') {
+    const prodId = endpoint.split('/')[2]?.split('?')[0];
+    const index = mockProducts.findIndex((p) => p.id === prodId);
+    if (index === -1) {
+      throw new ApiError('Product not found', 'NOT_FOUND', 404);
+    }
+
+    const { name, categoryId, unitOfMeasure, costPerUnit, reorderPoint, reorderQuantity } = body;
+    const oldProduct = mockProducts[index];
+
+    if (categoryId && categoryId !== oldProduct.categoryId) {
+      const oldCat = mockCategories.find((c) => c.id === oldProduct.categoryId);
+      if (oldCat && oldCat.productCount > 0) oldCat.productCount -= 1;
+      const newCat = mockCategories.find((c) => c.id === categoryId);
+      if (newCat) newCat.productCount = (newCat.productCount || 0) + 1;
+      mockProducts[index].categoryId = categoryId;
+    }
+
+    if (name) mockProducts[index].name = name.trim();
+    if (unitOfMeasure) mockProducts[index].unitOfMeasure = unitOfMeasure.trim();
+    if (costPerUnit !== undefined) mockProducts[index].costPerUnit = Number(costPerUnit);
+    if (reorderPoint !== undefined) mockProducts[index].reorderPoint = Number(reorderPoint);
+    if (reorderQuantity !== undefined) mockProducts[index].reorderQuantity = Number(reorderQuantity);
+    mockProducts[index].updatedAt = new Date().toISOString();
+
+    const cat = mockCategories.find((c) => c.id === mockProducts[index].categoryId);
+
+    return {
+      data: {
+        ...mockProducts[index],
+        category: cat ? { id: cat.id, name: cat.name } : undefined,
+      } as unknown as T,
+      message: 'Product updated successfully',
+    };
+  }
+
+  // DELETE /products/:productId
+  if (endpoint.startsWith('/products/') && method === 'DELETE') {
+    const prodId = endpoint.split('/')[2]?.split('?')[0];
+    const prod = mockProducts.find((p) => p.id === prodId);
+    if (!prod) {
+      throw new ApiError('Product not found', 'NOT_FOUND', 404);
+    }
+
+    // Invariant: check if product has active stock
+    const stockEntries = mockStockEntries.filter((se) => se.productId === prodId);
+    const totalOnHand = stockEntries.reduce((sum, se) => sum + se.onHand, 0);
+    if (totalOnHand > 0) {
+      throw new ApiError(
+        `Cannot delete product "${prod.name}" (${prod.sku}). It still has ${totalOnHand} units on hand. Deactivate or write off inventory first.`,
+        'CONFLICT',
+        409
+      );
+    }
+
+    mockProducts = mockProducts.filter((p) => p.id !== prodId);
+    const cat = mockCategories.find((c) => c.id === prod.categoryId);
+    if (cat && cat.productCount > 0) cat.productCount -= 1;
+
+    return {
+      data: null as unknown as T,
+      message: 'Product deactivated successfully',
+    };
+  }
+
+  // GET /products/:productId/stock-breakdown
+  if (endpoint.includes('/stock-breakdown') && method === 'GET') {
+    const prodId = endpoint.split('/')[2];
+    const entries = mockStockEntries.filter((se) => se.productId === prodId);
+    const breakdown = entries.map((se) => {
+      const wh = mockWarehouses.find((w) => w.id === se.warehouseId);
+      const loc = mockLocations.find((l) => l.id === se.locationId);
+      return {
+        warehouseId: se.warehouseId,
+        warehouseName: wh?.name || 'Unknown Warehouse',
+        locationId: se.locationId,
+        locationName: loc?.name || 'Unknown Location',
+        onHand: se.onHand,
+        reserved: se.reserved,
+        freeToUse: se.freeToUse,
+      };
+    });
+
+    return {
+      data: breakdown as unknown as T,
+    };
+  }
+
+  // ==========================================
+  // REORDERING RULES ENDPOINTS
+  // ==========================================
+
+  // GET /reordering-rules?productId=...
+  if (endpoint.startsWith('/reordering-rules') && method === 'GET') {
+    const url = new URL(`http://localhost${endpoint}`);
+    const productId = url.searchParams.get('productId');
+
+    let rules = mockReorderingRules;
+    if (productId) {
+      rules = rules.filter((r) => r.productId === productId);
+    }
+
+    const enhanced = rules.map((r) => {
+      const wh = mockWarehouses.find((w) => w.id === r.warehouseId);
+      const loc = mockLocations.find((l) => l.id === r.locationId);
+      return {
+        ...r,
+        warehouseName: wh?.name || 'Unknown Warehouse',
+        locationName: loc?.name || 'Unknown Location',
+      };
+    });
+
+    return {
+      data: enhanced as unknown as T,
+    };
+  }
+
+  // POST /reordering-rules
+  if (endpoint === '/reordering-rules' && method === 'POST') {
+    const { productId, warehouseId, locationId, minQuantity, maxQuantity } = body;
+    const ruleId = `rule_${Date.now().toString(36)}`;
+    const newRule = {
+      id: ruleId,
+      productId,
+      warehouseId,
+      locationId,
+      minQuantity: Number(minQuantity),
+      maxQuantity: Number(maxQuantity),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockReorderingRules.push(newRule);
+    const wh = mockWarehouses.find((w) => w.id === warehouseId);
+    const loc = mockLocations.find((l) => l.id === locationId);
+
+    return {
+      data: {
+        ...newRule,
+        warehouseName: wh?.name,
+        locationName: loc?.name,
+      } as unknown as T,
+      message: 'Reordering rule created successfully',
+    };
+  }
+
+  // PATCH /reordering-rules/:ruleId
+  if (endpoint.startsWith('/reordering-rules/') && method === 'PATCH') {
+    const ruleId = endpoint.split('/')[2]?.split('?')[0];
+    const index = mockReorderingRules.findIndex((r) => r.id === ruleId);
+    if (index === -1) {
+      throw new ApiError('Reordering rule not found', 'NOT_FOUND', 404);
+    }
+
+    const { warehouseId, locationId, minQuantity, maxQuantity } = body;
+    if (warehouseId) mockReorderingRules[index].warehouseId = warehouseId;
+    if (locationId) mockReorderingRules[index].locationId = locationId;
+    if (minQuantity !== undefined) mockReorderingRules[index].minQuantity = Number(minQuantity);
+    if (maxQuantity !== undefined) mockReorderingRules[index].maxQuantity = Number(maxQuantity);
+    mockReorderingRules[index].updatedAt = new Date().toISOString();
+
+    const wh = mockWarehouses.find((w) => w.id === mockReorderingRules[index].warehouseId);
+    const loc = mockLocations.find((l) => l.id === mockReorderingRules[index].locationId);
+
+    return {
+      data: {
+        ...mockReorderingRules[index],
+        warehouseName: wh?.name,
+        locationName: loc?.name,
+      } as unknown as T,
+      message: 'Reordering rule updated successfully',
+    };
+  }
+
+  // DELETE /reordering-rules/:ruleId
+  if (endpoint.startsWith('/reordering-rules/') && method === 'DELETE') {
+    const ruleId = endpoint.split('/')[2]?.split('?')[0];
+    mockReorderingRules = mockReorderingRules.filter((r) => r.id !== ruleId);
+    return {
+      data: null as unknown as T,
+      message: 'Reordering rule removed successfully',
     };
   }
 
