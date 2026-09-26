@@ -1,0 +1,14 @@
+{
+  "name": "stocksense",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "build:frontend": "npm run build --workspace=apps/frontend",
+    "typecheck:frontend": "npm run typecheck --workspace=apps/frontend"
+  }
+}
