@@ -1,8 +1,21 @@
 import { db } from "../db";
 import { referenceSequences, warehouses } from "../db/schema";
 import { eq, and } from "drizzle-orm";
+import type { ExtractTablesWithRelations } from "drizzle-orm";
+import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
+import type { PgTransaction } from "drizzle-orm/pg-core";
+import * as schema from "../db/schema";
 
 export type OperationType = "IN" | "OUT" | "INT" | "ADJ";
+
+/** Accepts either the root db client or a Drizzle transaction */
+type AnyDb =
+  | typeof db
+  | PgTransaction<
+      NodePgQueryResultHKT,
+      typeof schema,
+      ExtractTablesWithRelations<typeof schema>
+    >;
 
 /**
  * Generates the next reference number for a warehouse + operation type.
@@ -19,7 +32,7 @@ export type OperationType = "IN" | "OUT" | "INT" | "ADJ";
 export async function generateReference(
   warehouseId: string,
   opType: OperationType,
-  tx?: typeof db
+  tx?: AnyDb
 ): Promise<string> {
   const conn = tx ?? db;
 
