@@ -5,6 +5,7 @@ import cors from "cors";
 import { env } from "./config/env";
 import { globalRateLimiter } from "./middleware/rateLimiter";
 import { errorHandler } from "./middleware/errorHandler";
+import authRouter from "./modules/auth/auth.router";
 
 const app = express();
 
@@ -30,19 +31,24 @@ app.get("/health", (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// API routes (mounted per phase)
+// API routes
 // ---------------------------------------------------------------------------
-// Phase 1: Auth — imported in phase-1 branch
-// app.use("/api/auth", authRouter);
+const api = express.Router();
+
+// Phase 1: Auth
+api.use("/auth", authRouter);
+
+app.use("/api/v1", api);
 
 // ---------------------------------------------------------------------------
 // 404 handler
 // ---------------------------------------------------------------------------
 app.use((_req, res) => {
   res.status(404).json({
-    status: "error",
-    code: "NOT_FOUND",
-    message: "The requested resource was not found.",
+    error: {
+      code: "NOT_FOUND",
+      message: "The requested resource was not found.",
+    },
   });
 });
 
