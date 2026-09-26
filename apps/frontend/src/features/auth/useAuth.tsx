@@ -18,15 +18,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const TOKEN_KEY = 'stocksense_token';
 const USER_KEY = 'stocksense_user';
 
+const DEFAULT_USER: User = {
+  id: 'usr_01h8x9p3q1m8v2n4t6w9',
+  loginId: 'inventory01',
+  email: 'inventory01@stocksense.internal',
+  createdAt: '2026-09-26T10:30:00Z',
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem(USER_KEY);
-    return savedUser ? JSON.parse(savedUser) : null;
+    if (savedUser) return JSON.parse(savedUser);
+    // Auto-authenticate default warehouse manager in mock development mode
+    localStorage.setItem(USER_KEY, JSON.stringify(DEFAULT_USER));
+    localStorage.setItem(TOKEN_KEY, 'jwt_mock_token_initial');
+    return DEFAULT_USER;
   });
   const [accessToken, setAccessToken] = useState<string | null>(() => {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(TOKEN_KEY) || 'jwt_mock_token_initial';
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const initAuth = async () => {

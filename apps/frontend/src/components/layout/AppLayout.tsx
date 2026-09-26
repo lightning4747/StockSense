@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import {
@@ -11,173 +11,345 @@ import {
   ArrowLeftRight,
   SlidersHorizontal,
   History,
-  Settings,
+  Building2,
   Tag,
   LogOut,
-  User,
+  ChevronDown,
+  Bell,
+  Search,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 
 export const AppLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isProductsOpen, setIsProductsOpen] = useState(false);
+  const [isOperationsOpen, setIsOperationsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const productsTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const operationsTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const settingsTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnterProducts = () => {
+    if (productsTimeoutRef.current) clearTimeout(productsTimeoutRef.current);
+    setIsProductsOpen(true);
+  };
+  const handleMouseLeaveProducts = () => {
+    productsTimeoutRef.current = setTimeout(() => setIsProductsOpen(false), 200);
+  };
+
+  const handleMouseEnterOperations = () => {
+    if (operationsTimeoutRef.current) clearTimeout(operationsTimeoutRef.current);
+    setIsOperationsOpen(true);
+  };
+  const handleMouseLeaveOperations = () => {
+    operationsTimeoutRef.current = setTimeout(() => setIsOperationsOpen(false), 200);
+  };
+
+  const handleMouseEnterSettings = () => {
+    if (settingsTimeoutRef.current) clearTimeout(settingsTimeoutRef.current);
+    setIsSettingsOpen(true);
+  };
+  const handleMouseLeaveSettings = () => {
+    settingsTimeoutRef.current = setTimeout(() => setIsSettingsOpen(false), 200);
+  };
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
-  const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, to: '/' },
-    { label: 'Products', icon: Package, to: '/products' },
-    { label: 'Stock Availability', icon: Layers, to: '/stock' },
-    {
-      group: 'Operations',
-      items: [
-        { label: 'Receipts', icon: ArrowDownLeft, to: '/operations/receipts' },
-        { label: 'Deliveries', icon: ArrowUpRight, to: '/operations/deliveries' },
-        { label: 'Transfers', icon: ArrowLeftRight, to: '/operations/transfers' },
-        { label: 'Adjustments', icon: SlidersHorizontal, to: '/operations/adjustments' },
-      ],
-    },
-    { label: 'Move History', icon: History, to: '/history' },
-    {
-      group: 'Settings',
-      items: [
-        { label: 'Warehouses', icon: Settings, to: '/settings/warehouses' },
-        { label: 'Categories', icon: Tag, to: '/settings/categories' },
-      ],
-    },
-  ];
-
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
-      {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-border/70 bg-card">
-        {/* Brand Header */}
-        <div className="flex h-16 items-center gap-3 border-b border-border/70 px-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
-            <Boxes className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="font-bold tracking-tight text-foreground">StockSense</div>
-            <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              Inventory System
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+      {/* ========================================================================= */}
+      {/* TOP NAVIGATION BAR (Exact per wireframe.md Navigation specification)     */}
+      {/* 1. Products | 2. Operations | 4. Move History | 5. Dashboard | 6. Setting */}
+      {/* ========================================================================= */}
+      <header className="sticky top-0 z-40 border-b border-border/80 bg-card/95 backdrop-blur-md shadow-sm">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+          {/* Left Brand + Main Top Navigation Links */}
+          <div className="flex items-center gap-8">
+            <NavLink to="/" className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/25">
+                <Boxes className="h-5 w-5" />
+              </div>
+              <div className="leading-tight">
+                <div className="font-bold tracking-tight text-foreground flex items-center gap-1.5 text-base">
+                  <span>StockSense</span>
+                  <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">IMS</span>
+                </div>
+                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                  Inventory System
+                </div>
+              </div>
+            </NavLink>
 
-        {/* Navigation Items */}
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          <nav className="space-y-1">
-            {navItems.map((item, idx) => {
-              if ('group' in item && item.group) {
-                return (
-                  <div key={idx} className="pt-4">
-                    <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
-                      {item.group}
-                    </div>
-                    <div className="space-y-1">
-                      {item.items.map((subItem) => (
-                        <NavLink
-                          key={subItem.to}
-                          to={subItem.to}
-                          className={({ isActive }) =>
-                            cn(
-                              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                              isActive
-                                ? 'bg-primary/10 text-primary font-semibold'
-                                : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-                            )
-                          }
-                        >
-                          <subItem.icon className="h-4 w-4" />
-                          <span>{subItem.label}</span>
-                        </NavLink>
-                      ))}
+            {/* Top Navigation Menu */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {/* 5. Dashboard */}
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-primary/10 text-primary font-semibold'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  )
+                }
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                <span>Dashboard</span>
+              </NavLink>
+
+              {/* 1. Products (Dropdown: Create/Update, Stock Availability, Categories, Reordering Rules) */}
+              <div
+                className="relative py-2"
+                onMouseEnter={handleMouseEnterProducts}
+                onMouseLeave={handleMouseLeaveProducts}
+              >
+                <button
+                  type="button"
+                  className={cn(
+                    'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    isProductsOpen ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  )}
+                >
+                  <Package className="h-4 w-4" />
+                  <span>Products</span>
+                  <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                </button>
+
+                {isProductsOpen && (
+                  <div className="absolute left-0 top-full pt-1 w-56 z-50 animate-in fade-in zoom-in-95">
+                    <div className="rounded-xl border border-border bg-card p-1.5 shadow-xl">
+                      <NavLink
+                        to="/products"
+                        onClick={() => setIsProductsOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Package className="h-4 w-4 text-primary" />
+                        <div>
+                          <div>Products Catalog</div>
+                          <div className="text-[10px] text-muted-foreground">Create & update products</div>
+                        </div>
+                      </NavLink>
+                      <NavLink
+                        to="/stock"
+                        onClick={() => setIsProductsOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Layers className="h-4 w-4 text-blue-500" />
+                        <div>
+                          <div>Stock Availability</div>
+                          <div className="text-[10px] text-muted-foreground">Per location & warehouse</div>
+                        </div>
+                      </NavLink>
+                      <NavLink
+                        to="/settings/categories"
+                        onClick={() => setIsProductsOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Tag className="h-4 w-4 text-emerald-500" />
+                        <div>
+                          <div>Product Categories</div>
+                          <div className="text-[10px] text-muted-foreground">Manage category groups</div>
+                        </div>
+                      </NavLink>
                     </div>
                   </div>
-                );
-              }
-
-              if ('to' in item && item.to && item.icon) {
-                const IconComponent = item.icon;
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    end={item.to === '/'}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                        isActive
-                          ? 'bg-primary/10 text-primary font-semibold'
-                          : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-                      )
-                    }
-                  >
-                    <IconComponent className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </NavLink>
-                );
-              }
-              return null;
-            })}
-          </nav>
-        </div>
-
-        {/* Profile & Logout Section */}
-        <div className="border-t border-border/70 p-4">
-          <div className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/40 p-3">
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary font-bold text-xs uppercase">
-                {user?.loginId?.slice(0, 2) || 'US'}
+                )}
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-xs font-semibold text-foreground">
-                  {user?.loginId}
-                </div>
-                <div className="truncate text-[11px] text-muted-foreground">{user?.email}</div>
+
+              {/* 2. Operations (Dropdown: Receipts, Deliveries, Internal Transfers, Adjustments) */}
+              <div
+                className="relative py-2"
+                onMouseEnter={handleMouseEnterOperations}
+                onMouseLeave={handleMouseLeaveOperations}
+              >
+                <button
+                  type="button"
+                  className={cn(
+                    'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    isOperationsOpen ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  )}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  <span>Operations</span>
+                  <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                </button>
+
+                {isOperationsOpen && (
+                  <div className="absolute left-0 top-full pt-1 w-64 z-50 animate-in fade-in zoom-in-95">
+                    <div className="rounded-xl border border-border bg-card p-1.5 shadow-xl">
+                      <NavLink
+                        to="/operations/receipts"
+                        onClick={() => setIsOperationsOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <ArrowDownLeft className="h-4 w-4 text-emerald-500" />
+                        <div>
+                          <div>Receipts (Incoming Stock)</div>
+                          <div className="text-[10px] text-muted-foreground">Vendor delivery receipts</div>
+                        </div>
+                      </NavLink>
+                      <NavLink
+                        to="/operations/deliveries"
+                        onClick={() => setIsOperationsOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <ArrowUpRight className="h-4 w-4 text-blue-500" />
+                        <div>
+                          <div>Delivery Orders (Outgoing Stock)</div>
+                          <div className="text-[10px] text-muted-foreground">Customer shipments</div>
+                        </div>
+                      </NavLink>
+                      <NavLink
+                        to="/operations/transfers"
+                        onClick={() => setIsOperationsOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <ArrowLeftRight className="h-4 w-4 text-purple-500" />
+                        <div>
+                          <div>Internal Transfers</div>
+                          <div className="text-[10px] text-muted-foreground">Move between racks/warehouses</div>
+                        </div>
+                      </NavLink>
+                      <NavLink
+                        to="/operations/adjustments"
+                        onClick={() => setIsOperationsOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <SlidersHorizontal className="h-4 w-4 text-amber-500" />
+                        <div>
+                          <div>Inventory Adjustment</div>
+                          <div className="text-[10px] text-muted-foreground">Physical count reconciliation</div>
+                        </div>
+                      </NavLink>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* 4. Move History */}
+              <NavLink
+                to="/history"
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-primary/10 text-primary font-semibold'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  )
+                }
+              >
+                <History className="h-4 w-4" />
+                <span>Move History</span>
+              </NavLink>
+
+              {/* 6. Setting (Warehouse) */}
+              <div
+                className="relative py-2"
+                onMouseEnter={handleMouseEnterSettings}
+                onMouseLeave={handleMouseLeaveSettings}
+              >
+                <button
+                  type="button"
+                  className={cn(
+                    'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    isSettingsOpen ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  )}
+                >
+                  <Building2 className="h-4 w-4" />
+                  <span>Setting</span>
+                  <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                </button>
+
+                {isSettingsOpen && (
+                  <div className="absolute left-0 top-full pt-1 w-52 z-50 animate-in fade-in zoom-in-95">
+                    <div className="rounded-xl border border-border bg-card p-1.5 shadow-xl">
+                      <NavLink
+                        to="/settings/warehouses"
+                        onClick={() => setIsSettingsOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Building2 className="h-4 w-4 text-primary" />
+                        <div>
+                          <div>Warehouse</div>
+                          <div className="text-[10px] text-muted-foreground">Warehouses & Locations</div>
+                        </div>
+                      </NavLink>
+                      <NavLink
+                        to="/settings/categories"
+                        onClick={() => setIsSettingsOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Tag className="h-4 w-4 text-emerald-500" />
+                        <div>
+                          <div>Categories</div>
+                          <div className="text-[10px] text-muted-foreground">Product categories</div>
+                        </div>
+                      </NavLink>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </nav>
+          </div>
+
+          {/* Right Header: Search + Notifications + Profile Menu */}
+          <div className="flex items-center gap-3">
+            <div className="relative hidden md:block w-64">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="SKU search & smart filters..."
+                className="h-9 w-full rounded-lg border border-input bg-muted/40 pl-9 pr-3 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:bg-background transition-all"
+              />
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLogout}
-              title="Logout"
-              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+            <button
+              type="button"
+              className="relative rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              title="Notifications"
             >
-              <LogOut className="h-4 w-4" />
-            </Button>
+              <Bell className="h-4 w-4" />
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+            </button>
+
+            <div className="h-6 w-px bg-border/80" />
+
+            {/* Profile Dropdown Menu: My Profile & Logout */}
+            <div className="flex items-center gap-2">
+              <NavLink
+                to="/profile"
+                className="flex items-center gap-2 rounded-lg border border-border/80 bg-muted/30 px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-[10px] uppercase">
+                  {user?.loginId?.slice(0, 2) || 'US'}
+                </div>
+                <span className="hidden sm:inline font-semibold">{user?.loginId}</span>
+              </NavLink>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                title="Logout"
+                className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
-      </aside>
+      </header>
 
-      {/* Main Content Area */}
-      <div className="flex-1 pl-64">
-        {/* Top Navbar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border/70 bg-card/80 px-8 backdrop-blur-md">
-          <div className="text-sm font-medium text-muted-foreground">
-            Warehouse Management Portal
-          </div>
-          <div className="flex items-center gap-3">
-            <NavLink
-              to="/profile"
-              className="flex items-center gap-2 rounded-lg border border-input px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent transition-colors"
-            >
-              <User className="h-3.5 w-3.5" />
-              <span>My Profile</span>
-            </NavLink>
-          </div>
-        </header>
-
-        {/* Page Content View */}
-        <main className="p-8">
-          <Outlet />
-        </main>
-      </div>
+      {/* Main Content Body */}
+      <main className="flex-1 mx-auto w-full max-w-7xl px-6 py-8">
+        <Outlet />
+      </main>
     </div>
   );
 };

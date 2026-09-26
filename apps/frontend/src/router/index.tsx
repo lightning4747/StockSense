@@ -7,6 +7,8 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { DashboardPlaceholder } from '@/features/dashboard/DashboardPlaceholder';
 import { ProfilePage } from '@/features/profile/ProfilePage';
 import { CategoriesPage } from '@/features/settings/CategoriesPage';
+import { WarehousesPage } from '@/features/settings/WarehousesPage';
+import { LocationsPage } from '@/features/settings/LocationsPage';
 
 export const router = createBrowserRouter([
   {
@@ -100,20 +102,23 @@ export const router = createBrowserRouter([
           },
           {
             path: '/settings',
-            element: <Navigate to="/settings/categories" replace />,
+            element: <Navigate to="/settings/warehouses" replace />,
+          },
+          {
+            path: '/settings/warehouses',
+            element: <WarehousesPage />,
+          },
+          {
+            path: '/settings/warehouses/:warehouseId/locations',
+            element: <LocationsPage />,
+          },
+          {
+            path: '/settings/locations',
+            element: <LocationsPage />,
           },
           {
             path: '/settings/categories',
             element: <CategoriesPage />,
-          },
-          {
-            path: '/settings/warehouses',
-            element: (
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold tracking-tight">Warehouses & Locations</h1>
-                <p className="text-sm text-muted-foreground">Manage physical warehouses and storage racks</p>
-              </div>
-            ),
           },
         ],
       },
