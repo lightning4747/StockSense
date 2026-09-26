@@ -9,6 +9,9 @@ import { ProfilePage } from '@/features/profile/ProfilePage';
 import { CategoriesPage } from '@/features/settings/CategoriesPage';
 import { WarehousesPage } from '@/features/settings/WarehousesPage';
 import { LocationsPage } from '@/features/settings/LocationsPage';
+import { ProductsPage } from '@/features/products/ProductsPage';
+import { ProductCreatePage } from '@/features/products/ProductCreatePage';
+import { ProductDetailPage } from '@/features/products/ProductDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -39,12 +42,15 @@ export const router = createBrowserRouter([
           },
           {
             path: '/products',
-            element: (
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold tracking-tight">Products</h1>
-                <p className="text-sm text-muted-foreground">Product catalog and inventory status</p>
-              </div>
-            ),
+            element: <ProductsPage />,
+          },
+          {
+            path: '/products/new',
+            element: <ProductCreatePage />,
+          },
+          {
+            path: '/products/:productId',
+            element: <ProductDetailPage />,
           },
           {
             path: '/stock',

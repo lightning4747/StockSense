@@ -31,6 +31,8 @@ export interface Location {
   updatedAt?: string;
 }
 
+export type WarehouseLocation = Location;
+
 export interface CreateLocationPayload {
   name: string;
   shortCode: string;
