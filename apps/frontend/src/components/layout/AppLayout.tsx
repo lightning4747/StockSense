@@ -12,6 +12,7 @@ import {
   SlidersHorizontal,
   History,
   Settings,
+  Tag,
   LogOut,
   User,
 } from 'lucide-react';
@@ -41,7 +42,13 @@ export const AppLayout: React.FC = () => {
       ],
     },
     { label: 'Move History', icon: History, to: '/history' },
-    { label: 'Settings', icon: Settings, to: '/settings' },
+    {
+      group: 'Settings',
+      items: [
+        { label: 'Warehouses', icon: Settings, to: '/settings/warehouses' },
+        { label: 'Categories', icon: Tag, to: '/settings/categories' },
+      ],
+    },
   ];
 
   return (
