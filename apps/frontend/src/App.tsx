@@ -1,7 +1,11 @@
+import { RouterProvider } from 'react-router-dom';
+import { AuthProvider } from '@/features/auth/useAuth';
+import { router } from '@/router';
+
 export default function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <h1 className="text-2xl font-bold tracking-tight">StockSense IMS</h1>
-    </div>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   );
 }
