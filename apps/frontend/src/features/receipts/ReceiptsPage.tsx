@@ -288,7 +288,10 @@ export const ReceiptsPage: React.FC = () => {
                 </tr>
               ) : (
                 receipts.map((receipt) => {
-                  const totalQty = receipt.items.reduce((sum, it) => sum + it.quantity, 0);
+                  const items = Array.isArray(receipt.items) ? receipt.items : [];
+                  const totalQty = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+                  const warehouse = warehouses.find((w) => w.id === receipt.warehouseId);
+                  const destinationLabel = receipt.to || (warehouse ? `${warehouse.name} (${warehouse.shortCode})` : 'Warehouse Storage');
 
                   return (
                     <tr
@@ -300,12 +303,12 @@ export const ReceiptsPage: React.FC = () => {
                         <span className="rounded bg-primary/10 px-2.5 py-1">{receipt.reference}</span>
                       </td>
                       <td className="px-6 py-4 text-xs text-muted-foreground font-medium">
-                        {receipt.from || 'Vendor'}
+                        {receipt.from || receipt.supplierName || 'Vendor'}
                       </td>
                       <td className="px-6 py-4 text-xs font-semibold text-foreground">
                         <div className="flex items-center gap-1.5">
                           <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span>{receipt.to}</span>
+                          <span>{destinationLabel}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-xs font-medium text-foreground">
@@ -320,7 +323,7 @@ export const ReceiptsPage: React.FC = () => {
                       <td className="px-6 py-4 text-center">{getStatusBadge(receipt.status)}</td>
                       <td className="px-6 py-4 text-right text-xs font-semibold text-foreground">
                         <span className="rounded-md bg-muted px-2 py-0.5">
-                          {receipt.items.length} line(s) · {totalQty} qty
+                          {items.length > 0 ? `${items.length} line(s) · ${totalQty} qty` : 'View details'}
                         </span>
                       </td>
                     </tr>

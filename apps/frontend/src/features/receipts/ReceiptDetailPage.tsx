@@ -159,7 +159,8 @@ export const ReceiptDetailPage: React.FC = () => {
     );
   }
 
-  const totalQuantity = receipt.items.reduce((sum, it) => sum + it.quantity, 0);
+  const receiptItems = Array.isArray(receipt.items) ? receipt.items : [];
+  const totalQuantity = receiptItems.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-300">
@@ -345,24 +346,32 @@ export const ReceiptDetailPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
-              {receipt.items.map((item) => (
-                <tr key={item.id} className="hover:bg-muted/20 transition-colors">
-                  <td className="py-3 px-3 font-mono font-semibold text-primary">
-                    <span className="rounded bg-primary/10 px-2 py-0.5">{item.sku}</span>
-                  </td>
-                  <td className="py-3 px-3 font-medium text-foreground">{item.productName}</td>
-                  <td className="py-3 px-3 text-right font-bold text-foreground text-sm">
-                    {item.quantity}
-                  </td>
-                  <td className="py-3 px-3 text-right">
-                    {receipt.status === 'DONE' ? (
-                      <span className="text-emerald-600 font-semibold">+{item.quantity} On Hand</span>
-                    ) : (
-                      <span className="text-muted-foreground">Pending Validation</span>
-                    )}
+              {receiptItems.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-6 text-center text-muted-foreground">
+                    No line items recorded for this receipt.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                receiptItems.map((item) => (
+                  <tr key={item.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="py-3 px-3 font-mono font-semibold text-primary">
+                      <span className="rounded bg-primary/10 px-2 py-0.5">{item.sku}</span>
+                    </td>
+                    <td className="py-3 px-3 font-medium text-foreground">{item.productName}</td>
+                    <td className="py-3 px-3 text-right font-bold text-foreground text-sm">
+                      {item.quantity}
+                    </td>
+                    <td className="py-3 px-3 text-right">
+                      {receipt.status === 'DONE' ? (
+                        <span className="text-emerald-600 font-semibold">+{item.quantity} On Hand</span>
+                      ) : (
+                        <span className="text-muted-foreground">Pending Validation</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
