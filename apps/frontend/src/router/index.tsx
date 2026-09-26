@@ -4,7 +4,7 @@ import { SignupPage } from '@/features/auth/SignupPage';
 import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { DashboardPlaceholder } from '@/features/dashboard/DashboardPlaceholder';
+import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { ProfilePage } from '@/features/profile/ProfilePage';
 import { CategoriesPage } from '@/features/settings/CategoriesPage';
 import { WarehousesPage } from '@/features/settings/WarehousesPage';
@@ -37,7 +37,11 @@ export const router = createBrowserRouter([
         children: [
           {
             path: '/',
-            element: <DashboardPlaceholder />,
+            element: <DashboardPage />,
+          },
+          {
+            path: '/dashboard',
+            element: <DashboardPage />,
           },
           {
             path: '/profile',

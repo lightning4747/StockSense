@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   loginId: varchar("login_id", { length: 12 }).notNull().unique(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  role: varchar("role", { length: 50 }).notNull().default("INVENTORY_MANAGER"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

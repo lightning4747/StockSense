@@ -11,15 +11,20 @@
  */
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { eq } from "drizzle-orm";
 import { Pool } from "pg";
 import { hash } from "argon2";
 import { v4 as uuidv4 } from "uuid";
 import { env } from "../config/env";
 import * as schema from "./schema";
 
-const SEED_ADMIN_LOGIN_ID = "admin";
-const SEED_ADMIN_EMAIL = process.env["SEED_ADMIN_EMAIL"] ?? "admin@stocksense.app";
-const SEED_ADMIN_PASSWORD = process.env["SEED_ADMIN_PASSWORD"] ?? "Admin@12345";
+const MANAGER_LOGIN_ID = "manager";
+const MANAGER_EMAIL = "manager@stocksense.app";
+const MANAGER_PASSWORD = "Manager@12345";
+
+const STAFF_LOGIN_ID = "warehouse";
+const STAFF_EMAIL = "staff@stocksense.app";
+const STAFF_PASSWORD = "Staff@12345";
 
 async function seed() {
   const pool = new Pool({ connectionString: env.DATABASE_URL });
@@ -28,39 +33,62 @@ async function seed() {
   console.log("🌱 Seeding database...");
 
   // -------------------------------------------------------------------------
-  // Admin user
+  // Target Users per REQUIREMENTS.md: Inventory Manager & Warehouse Staff
   // -------------------------------------------------------------------------
-  const adminId = uuidv4();
-  const passwordHash = await hash(SEED_ADMIN_PASSWORD);
-
+  const managerPasswordHash = await hash(MANAGER_PASSWORD);
   await db
     .insert(schema.users)
     .values({
-      id: adminId,
-      loginId: SEED_ADMIN_LOGIN_ID,
-      email: SEED_ADMIN_EMAIL,
-      passwordHash,
+      id: uuidv4(),
+      loginId: MANAGER_LOGIN_ID,
+      email: MANAGER_EMAIL,
+      passwordHash: managerPasswordHash,
+      role: "INVENTORY_MANAGER",
     })
     .onConflictDoNothing({ target: schema.users.loginId });
 
-  console.log(`  ✔ Admin user: loginId="${SEED_ADMIN_LOGIN_ID}", email="${SEED_ADMIN_EMAIL}"`);
+  const [managerUser] = await db
+    .select({ id: schema.users.id })
+    .from(schema.users)
+    .where(eq(schema.users.loginId, MANAGER_LOGIN_ID));
+
+  const managerId = managerUser!.id;
+  console.log(`  ✔ Inventory Manager: loginId="${MANAGER_LOGIN_ID}", email="${MANAGER_EMAIL}"`);
+
+  const staffPasswordHash = await hash(STAFF_PASSWORD);
+  await db
+    .insert(schema.users)
+    .values({
+      id: uuidv4(),
+      loginId: STAFF_LOGIN_ID,
+      email: STAFF_EMAIL,
+      passwordHash: staffPasswordHash,
+      role: "WAREHOUSE_STAFF",
+    })
+    .onConflictDoNothing({ target: schema.users.loginId });
+
+  console.log(`  ✔ Warehouse Staff: loginId="${STAFF_LOGIN_ID}", email="${STAFF_EMAIL}"`);
 
   // -------------------------------------------------------------------------
   // Default warehouse
   // -------------------------------------------------------------------------
-  const warehouseId = uuidv4();
-
   await db
     .insert(schema.warehouses)
     .values({
-      id: warehouseId,
+      id: uuidv4(),
       name: "Main Warehouse",
       shortCode: "WH",
       address: "123 Default Street",
-      createdBy: adminId,
-      updatedBy: adminId,
+      createdBy: managerId,
+      updatedBy: managerId,
     })
     .onConflictDoNothing({ target: schema.warehouses.shortCode });
+
+  const [wh] = await db
+    .select({ id: schema.warehouses.id })
+    .from(schema.warehouses)
+    .where(eq(schema.warehouses.shortCode, "WH"));
+  const warehouseId = wh!.id;
 
   console.log('  ✔ Warehouse: shortCode="WH"');
 
@@ -76,8 +104,8 @@ async function seed() {
       warehouseId,
       name: "Default Zone",
       shortCode: "A1",
-      createdBy: adminId,
-      updatedBy: adminId,
+      createdBy: managerId,
+      updatedBy: managerId,
     })
     .onConflictDoNothing();
 

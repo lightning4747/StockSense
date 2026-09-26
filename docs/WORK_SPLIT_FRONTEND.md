@@ -58,7 +58,7 @@ All frontend code lives in `apps/frontend/`. Stack: React 18 · TypeScript · Vi
 - [x] **Receipt detail page** (`/operations/receipts/:receiptId`) — full info, line items, status badge, action buttons: **Mark Ready** / **Validate** / **Cancel** (conditional per status)
 
 ### Phase 6 — Dashboard
-- [ ] **Dashboard page** (`/dashboard`) — default landing after login
+- [x] **Dashboard page** (`/dashboard`) — default landing after login
   - KPI cards: Total Products, Low Stock, Out of Stock, Pending Receipts, Pending Deliveries, Scheduled Transfers
   - Operations stats panel (receipts / deliveries: toReceive, late, waiting)
   - **Recharts** chart: stock movement trend (IN vs OUT quantities — derive from `/inventory/moves` or a dedicated aggregate)

@@ -85,7 +85,7 @@ async function sendOtpEmail(to: string, otp: string): Promise<void> {
 // ---------------------------------------------------------------------------
 
 export async function signup(body: SignupBody) {
-  const { loginId, email, password } = body;
+  const { loginId, email, password, role } = body;
 
   // Check uniqueness
   const existing = await db
@@ -124,6 +124,7 @@ export async function signup(body: SignupBody) {
     loginId,
     email,
     passwordHash,
+    role: role || "INVENTORY_MANAGER",
     createdBy: userId,
     updatedBy: userId,
   });
@@ -131,7 +132,7 @@ export async function signup(body: SignupBody) {
   const accessToken = issueAccessToken(userId, loginId);
 
   return {
-    user: { id: userId, loginId, email },
+    user: { id: userId, loginId, email, role: role || "INVENTORY_MANAGER" },
     accessToken,
   };
 }
@@ -164,7 +165,7 @@ export async function login(body: LoginBody) {
   const accessToken = issueAccessToken(user.id, user.loginId);
 
   return {
-    user: { id: user.id, loginId: user.loginId, email: user.email },
+    user: { id: user.id, loginId: user.loginId, email: user.email, role: user.role },
     accessToken,
   };
 }
@@ -190,6 +191,7 @@ export async function getMe(userId: string) {
       id: users.id,
       loginId: users.loginId,
       email: users.email,
+      role: users.role,
       createdAt: users.createdAt,
     })
     .from(users)

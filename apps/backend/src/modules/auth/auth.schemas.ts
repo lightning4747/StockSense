@@ -28,6 +28,7 @@ export const signupSchema = z.object({
   loginId: loginIdSchema,
   email: z.string().email("Must be a valid email address"),
   password: passwordSchema,
+  role: z.enum(["INVENTORY_MANAGER", "WAREHOUSE_STAFF"]).optional().default("INVENTORY_MANAGER"),
 });
 
 export type SignupBody = z.infer<typeof signupSchema>;
