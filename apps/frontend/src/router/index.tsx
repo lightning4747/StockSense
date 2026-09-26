@@ -12,6 +12,9 @@ import { LocationsPage } from '@/features/settings/LocationsPage';
 import { ProductsPage } from '@/features/products/ProductsPage';
 import { ProductCreatePage } from '@/features/products/ProductCreatePage';
 import { ProductDetailPage } from '@/features/products/ProductDetailPage';
+import { ReceiptsPage } from '@/features/receipts/ReceiptsPage';
+import { ReceiptCreatePage } from '@/features/receipts/ReceiptCreatePage';
+import { ReceiptDetailPage } from '@/features/receipts/ReceiptDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -63,12 +66,15 @@ export const router = createBrowserRouter([
           },
           {
             path: '/operations/receipts',
-            element: (
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold tracking-tight">Incoming Receipts</h1>
-                <p className="text-sm text-muted-foreground">Receive goods from vendor shipments</p>
-              </div>
-            ),
+            element: <ReceiptsPage />,
+          },
+          {
+            path: '/operations/receipts/new',
+            element: <ReceiptCreatePage />,
+          },
+          {
+            path: '/operations/receipts/:receiptId',
+            element: <ReceiptDetailPage />,
           },
           {
             path: '/operations/deliveries',

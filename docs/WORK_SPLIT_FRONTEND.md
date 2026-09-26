@@ -53,9 +53,9 @@ All frontend code lives in `apps/frontend/`. Stack: React 18 · TypeScript · Vi
 - [x] **Product detail / edit page** (`/products/:productId`) — metadata edit (stock not editable here), stock breakdown table by location, reordering rules sub-section
 
 ### Phase 4 — Operations: Receipts
-- [ ] **Receipts list page** (`/operations/receipts`) — table, filters (status, warehouse, date range, search), pagination
-- [ ] **Receipt create page** (`/operations/receipts/new`) — warehouse + destination location picker, supplier name, scheduled date, line items (product + qty)
-- [ ] **Receipt detail page** (`/operations/receipts/:receiptId`) — full info, line items, status badge, action buttons: **Mark Ready** / **Validate** / **Cancel** (conditional per status)
+- [x] **Receipts list page** (`/operations/receipts`) — table, filters (status, warehouse, date range, search), pagination
+- [x] **Receipt create page** (`/operations/receipts/new`) — warehouse + destination location picker, supplier name, scheduled date, line items (product + qty)
+- [x] **Receipt detail page** (`/operations/receipts/:receiptId`) — full info, line items, status badge, action buttons: **Mark Ready** / **Validate** / **Cancel** (conditional per status)
 
 ### Phase 6 — Dashboard
 - [ ] **Dashboard page** (`/dashboard`) — default landing after login
