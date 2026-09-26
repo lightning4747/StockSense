@@ -50,45 +50,44 @@ All backend code lives in `apps/backend/`. Database migrations and schema in `ap
 - [x] `GET /locations/:id`, `PATCH /locations/:id`, `DELETE /locations/:id` (soft delete guard)
 - [x] Reference number generator utility: `<WAREHOUSE_CODE>/IN/<SEQ>`, `/OUT/`, `/INT/`, `/ADJ/` — DB sequence per (warehouse_id, type)
 
-### Phase 3 — Products
-- [ ] `GET /products` — paginated, filterable (search, sku, categoryId, warehouseId, locationId, stockStatus, sort)
-- [ ] `POST /products` — create product; if `initialStock > 0`, open transaction: insert `stock_levels` + insert `inventory_ledger` (type=`IN`, reference=`WH/ADJ/XXXX`)
-- [ ] `GET /products/:id`
-- [ ] `PATCH /products/:id` — metadata only, SKU cannot change, stock not updated here
-- [ ] `DELETE /products/:id` — soft deactivate, blocked if movements exist
+### Phase 3 — Products ✅
+- [x] `GET /products` — paginated, filterable (search, sku, categoryId, warehouseId, locationId, stockStatus, sort)
+- [x] `POST /products` — create product; if `initialStock > 0`, open transaction: insert `stock_levels` + insert `inventory_ledger` (type=`IN`, reference=`WH/ADJ/XXXX`)
+- [x] `GET /products/:id`
+- [x] `PATCH /products/:id` — metadata only, SKU cannot change, stock not updated here
+- [x] `DELETE /products/:id` — soft deactivate, blocked if movements exist
 
-### Phase 4 — Operations: Receipts
-- [ ] `GET /receipts` — paginated, filterable
-- [ ] `POST /receipts` — create `DRAFT`, generate reference
-- [ ] `GET /receipts/:id` — with line items
-- [ ] `PATCH /receipts/:id` — blocked if DONE/CANCELED
-- [ ] `POST /receipts/:id/ready` — `DRAFT → READY`
-- [ ] `POST /receipts/:id/validate` — `READY → DONE`, **atomic transaction**:
+### Phase 4 — Operations: Receipts ✅
+- [x] `GET /receipts` — paginated, filterable
+- [x] `POST /receipts` — create `DRAFT`, generate reference
+- [x] `GET /receipts/:id` — with line items
+- [x] `PATCH /receipts/:id` — blocked if DONE/CANCELED
+- [x] `POST /receipts/:id/ready` — `DRAFT → READY`
+- [x] `POST /receipts/:id/validate` — `READY → DONE`, **atomic transaction**:
   - verify status
   - for each item: `stock_levels.on_hand += quantity` (INSERT or UPDATE with conflict)
   - insert `inventory_ledger` entries (type=`IN`)
   - set `validated_at`, mark DONE
   - idempotency key check
-- [ ] `POST /receipts/:id/cancel` — `DRAFT|READY → CANCELED`
+- [x] `POST /receipts/:id/cancel` — `DRAFT|READY → CANCELED`
 
-### Phase 5 — Inventory Ledger
-- [ ] `GET /inventory/moves` — paginated, filterable (reference, productId, warehouseId, locationId, movementType, dateFrom, dateTo)
-- [ ] `GET /inventory/moves/:id`
+### Phase 5 — Inventory Ledger ✅
+- [x] `GET /inventory/moves` — paginated, filterable (reference, productId, warehouseId, locationId, movementType, dateFrom, dateTo)
+- [x] `GET /inventory/moves/:id`
 
-### Phase 6 — Dashboard
-- [ ] `GET /dashboard` — KPI aggregation query (total products in stock, low/out stock, pending receipts/deliveries, scheduled transfers); supports warehouseId/locationId/categoryId filters
-- [ ] `GET /dashboard/operations` — receipts stats (toReceive, late, operations) + deliveries stats (toDeliver, late, waiting, operations)
+### Phase 6 — Dashboard ✅
+- [x] `GET /dashboard` — KPI aggregation query (total products in stock, low/out stock, pending receipts/deliveries, scheduled transfers); supports warehouseId/locationId/categoryId filters
+- [x] `GET /dashboard/operations` — receipts stats (toReceive, late, operations) + deliveries stats (toDeliver, late, waiting, operations)
 
-### Phase 7 — Global Search & Profile
-- [ ] `GET /search?q=&type=&limit=` — fuzzy search across products (SKU/name), receipts (reference), deliveries, transfers, ledger moves
-- [ ] `GET /profile` — return current user's editable profile
-- [ ] `PATCH /profile` — update email only; cannot change loginId or password here
+### Phase 7 — Global Search & Profile ✅
+- [x] `GET /search?q=&type=&limit=` — fuzzy search across products (SKU/name), receipts (reference), deliveries, transfers, ledger moves
+- [x] `GET /profile` — return current user's editable profile
+- [x] `PATCH /profile` — update email only; cannot change loginId or password here
 
-### Phase 8 — Hardening
+### Phase 8 — Hardening ✅
 - [x] Idempotency middleware: check `idempotency_keys` table, return cached response on duplicate key
-- [x] Apply idempotency to: `POST /deliveries/:id/validate`, `POST /transfers/:id/validate`, `POST /stock/adjustments`
-- [ ] Apply idempotency to: `POST /receipts/:id/validate` (pending Phase 4)
-- [ ] Audit field middleware: auto-populate `created_by`, `updated_by` from `req.user`
+- [x] Apply idempotency to: `POST /receipts/:id/validate`, `POST /deliveries/:id/validate`, `POST /transfers/:id/validate`, `POST /stock/adjustments`
+- [x] Audit field middleware: auto-populate `created_by`, `updated_by` from `req.user`
 - [x] Full error code coverage (§20 of API contract) — all handlers must return typed error codes
 
 ---
