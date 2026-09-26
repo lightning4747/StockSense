@@ -11,8 +11,8 @@ export interface StockItem {
   onHand: number;
   reserved: number;
   freeToUse: number;
-  costPerUnit?: number;
-  unitCost?: number;
+  costPerUnit?: number | string | null;
+  unitCost?: number | string | null;
 }
 
 export interface StockProductLocation {

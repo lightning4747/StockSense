@@ -340,7 +340,8 @@ export const StockPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-border/60">
                 {stockItems.map((item, idx) => {
-                  const cost = item.costPerUnit ?? item.unitCost ?? 0;
+                  const rawCost = item.costPerUnit ?? item.unitCost ?? 0;
+                  const numericCost = typeof rawCost === 'number' ? rawCost : parseFloat(String(rawCost)) || 0;
                   return (
                     <tr
                       key={`${item.productId}-${item.locationId}-${idx}`}
@@ -376,7 +377,7 @@ export const StockPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-xs text-muted-foreground">
-                        ${cost.toFixed(2)}
+                        ${numericCost.toFixed(2)}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {getStatusBadge(item)}

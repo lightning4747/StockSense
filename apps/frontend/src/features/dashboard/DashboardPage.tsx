@@ -127,8 +127,8 @@ export const DashboardPage: React.FC = () => {
   const moves = movesResponse?.data || [];
   const trendDataMap: Record<string, { date: string; inQty: number; outQty: number }> = {};
 
-  // Seed last 7 days so chart is always beautiful
-  for (let i = 6; i >= 0; i--) {
+  // Seed last 14 days by default to provide smooth chart visuals
+  for (let i = 13; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const key = d.toISOString().split('T')[0];
@@ -136,10 +136,16 @@ export const DashboardPage: React.FC = () => {
     trendDataMap[key] = { date: displayLabel, inQty: 0, outQty: 0 };
   }
 
-  // Populate actual ledger movements
+  // Populate actual ledger movements, creating dates dynamically if prior to window
   moves.forEach((move: any) => {
-    const dateKey = (move.createdAt || '').split('T')[0];
-    if (dateKey && trendDataMap[dateKey]) {
+    const rawDate = move.performedAt || move.createdAt || '';
+    const dateKey = rawDate.split('T')[0];
+    if (dateKey) {
+      if (!trendDataMap[dateKey]) {
+        const d = new Date(dateKey + 'T00:00:00');
+        const displayLabel = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        trendDataMap[dateKey] = { date: displayLabel, inQty: 0, outQty: 0 };
+      }
       const qty = Math.abs(Number(move.quantity) || 0);
       if (move.movementType === 'IN' || move.movementType === 'TRANSFER_IN') {
         trendDataMap[dateKey].inQty += qty;
@@ -149,7 +155,9 @@ export const DashboardPage: React.FC = () => {
     }
   });
 
-  const chartData = Object.values(trendDataMap);
+  const chartData = Object.keys(trendDataMap)
+    .sort()
+    .map((k) => trendDataMap[k]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
